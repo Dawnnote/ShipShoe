@@ -1,6 +1,7 @@
 package com.hanghae.shipshoe.domain.order.service;
 
 import com.hanghae.shipshoe.domain.delivery.entity.Delivery;
+import com.hanghae.shipshoe.domain.delivery.entity.DeliveryStatus;
 import com.hanghae.shipshoe.domain.item.entity.Item;
 import com.hanghae.shipshoe.domain.item.repository.ItemRepository;
 import com.hanghae.shipshoe.domain.order.dto.OrderRequest;
@@ -17,6 +18,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -26,6 +30,9 @@ public class OrderService {
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
     private final ItemRepository itemRepository;
+
+    private final ScheduledExecutorService scheduledExecutorService;
+
 
     @Transactional
     public OrderResponse order(OrderRequest request) {
@@ -39,8 +46,21 @@ public class OrderService {
 
         Order order = Order.createOrder(user, delivery, orderLine);
 
-        orderRepository.save(order);
+        Order saveOrder = orderRepository.save(order);
+
+
+        scheduleStatusUpdate(saveOrder, 5, DeliveryStatus.SHIP);
+        scheduleStatusUpdate(saveOrder, 10, DeliveryStatus.COMP);
+
         return new OrderResponse(order);
+    }
+
+    private void scheduleStatusUpdate(Order order, long delayInDays, DeliveryStatus status) {
+        long delayInMillis = TimeUnit.SECONDS.toMillis(delayInDays);
+        scheduledExecutorService.schedule(() -> {
+                    order.getDelivery().setStatus(status);
+                    orderRepository.save(order);
+                }, delayInMillis, TimeUnit.MILLISECONDS);
     }
 
 
