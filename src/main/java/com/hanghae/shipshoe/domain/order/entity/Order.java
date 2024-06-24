@@ -79,6 +79,18 @@ public class Order extends BaseEntity {
         }
     }
 
+    public void back() {
+        if (delivery.getStatus() == DeliveryStatus.READY ||
+            delivery.getStatus() == DeliveryStatus.SHIP ||
+            getStatus() == OrderStatus.CANCEL) {
+            throw new IllegalStateException("상품 반품 불가능");
+        }
+        this.setStatus(OrderStatus.RETURN);
+        for (OrderLine orderLine : orderLines) {
+            orderLine.back();
+        }
+    }
+
     public int getTotalPrice() {
         int totalPrice = 0;
 

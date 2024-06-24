@@ -15,19 +15,28 @@ public class OrderController {
 
     private final OrderService orderService;
 
+    // 주문 생성
     @PostMapping("/api/order")
     public OrderResponse order(@RequestBody OrderRequest request) {
         return orderService.order(request);
     }
 
+    // ORDER 상태의 주문 전체 조회
     @GetMapping("/api/user/{userId}/orders")
     public Page<OrderResponse> getOrders(@PathVariable("userId") Long userId,
                                          @PageableDefault(size = 3) Pageable pageable) {
         return orderService.findOrders(userId, pageable);
     }
 
+    // 주문 상품 취소
     @PostMapping("/api/order/{orderId}/cancel")
     public void cancelOrder(@PathVariable("orderId") Long orderId) {
         orderService.cancelOrder(orderId);
+    }
+
+    // 주문 상품 반품
+    @PostMapping("api/order/{orderId}/return")
+    public void returnOrder(@PathVariable("orderId") Long orderId) {
+        orderService.returnOrder(orderId);
     }
 }

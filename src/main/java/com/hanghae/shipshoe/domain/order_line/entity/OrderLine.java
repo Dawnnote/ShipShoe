@@ -61,6 +61,10 @@ public class OrderLine {
         getItem().addStock(orderCount);
     }
 
+    public void back() {
+        getItem().addStock(orderCount);
+    }
+
     public int getTotalPrice() {
         return getOrderPrice() * getOrderCount();
     }
