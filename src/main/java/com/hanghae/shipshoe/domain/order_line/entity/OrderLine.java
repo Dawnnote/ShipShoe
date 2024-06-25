@@ -30,38 +30,24 @@ public class OrderLine {
 
     protected OrderLine() {}
 
+    private void setOrderLine(Item item, int orderPrice, int orderCount) {
+        this.item = item;
+        this.orderPrice = orderPrice;
+        this.orderCount = orderCount;
+    }
+
     public void setOrder(Order order) {
         this.order = order;
     }
 
-    public void setItem(Item item) {
-        this.item = item;
-    }
-
-    public void setOrderPrice(int orderPrice) {
-        this.orderPrice = orderPrice;
-    }
-
-    public void setOrderCount(int orderCount) {
-        this.orderCount = orderCount;
-    }
-
     public static OrderLine createOrderLine(Item item, int price, int count) {
         OrderLine orderLine = new OrderLine();
-        orderLine.setItem(item);
-        orderLine.setOrderPrice(price);
-        orderLine.setOrderCount(count);
-
+        orderLine.setOrderLine(item, price, count);
         item.removeStock(count);
         return orderLine;
     }
 
-
     public void cancel() {
-        getItem().addStock(orderCount);
-    }
-
-    public void back() {
         getItem().addStock(orderCount);
     }
 

@@ -24,8 +24,22 @@ public class OrderController {
     // ORDER 상태의 주문 전체 조회
     @GetMapping("/api/user/{userId}/orders")
     public Page<OrderResponse> getOrders(@PathVariable("userId") Long userId,
-                                         @PageableDefault(size = 3) Pageable pageable) {
+                                         @PageableDefault(size = 10) Pageable pageable) {
         return orderService.findOrders(userId, pageable);
+    }
+
+    // 취소 상품 전체 조회
+    @GetMapping("/api/user/{userId}/orders/cancel")
+    public Page<OrderResponse> getCancelOrders(@PathVariable("userId") Long userId,
+                                               @PageableDefault(size = 10) Pageable pageable) {
+        return orderService.findCancelOrder(userId, pageable);
+    }
+
+    // 반품 상품 전체 조회
+    @GetMapping("/api/user/{userId}/orders/return")
+    public Page<OrderResponse> getReturnOrders(@PathVariable("userId") Long userId,
+                                               @PageableDefault(size = 10) Pageable pageable) {
+        return orderService.findReturnOrder(userId, pageable);
     }
 
     // 주문 상품 취소

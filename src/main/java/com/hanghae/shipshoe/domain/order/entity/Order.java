@@ -9,10 +9,11 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static jakarta.persistence.FetchType.*;
+import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
 @Table(name = "orders")
@@ -20,7 +21,8 @@ import static jakarta.persistence.FetchType.*;
 @ToString
 public class Order extends BaseEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_id")
     private Long id;
 
@@ -28,7 +30,7 @@ public class Order extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToOne(fetch = LAZY,cascade = CascadeType.ALL)
+    @OneToOne(fetch = LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "delivery_id")
     private Delivery delivery;
 
@@ -38,11 +40,14 @@ public class Order extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
-    public void setUser(User user) {
-        this.user = user;
+
+    public void addOrderLine(OrderLine orderLine) {
+        orderLines.add(orderLine);
+        orderLine.setOrder(this);
     }
 
-    public void setDelivery(Delivery delivery) {
+    private void setOrder(User user, Delivery delivery) {
+        this.user = user;
         this.delivery = delivery;
     }
 
@@ -50,17 +55,12 @@ public class Order extends BaseEntity {
         this.status = status;
     }
 
-    public void addOrderLine(OrderLine orderLine) {
-        orderLines.add(orderLine);
-        orderLine.setOrder(this);
+    protected Order() {
     }
-
-    protected Order(){}
 
     public static Order createOrder(User user, Delivery delivery, OrderLine... orderLines) {
         Order order = new Order();
-        order.setUser(user);
-        order.setDelivery(delivery);
+        order.setOrder(user, delivery);
         for (OrderLine orderLine : orderLines) {
             order.addOrderLine(orderLine);
         }
@@ -70,34 +70,36 @@ public class Order extends BaseEntity {
 
     public void cancel() {
         if (delivery.getStatus() == DeliveryStatus.SHIP ||
-            delivery.getStatus() == DeliveryStatus.COMP) {
+                delivery.getStatus() == DeliveryStatus.COMP) {
             throw new IllegalStateException("상품 취소 불가능");
         }
         this.setStatus(OrderStatus.CANCEL);
+        this.delivery.setStatus(DeliveryStatus.CANCEL);
         for (OrderLine orderLine : orderLines) {
             orderLine.cancel();
-        }
-    }
-
-    public void back() {
-        if (delivery.getStatus() == DeliveryStatus.READY ||
-            delivery.getStatus() == DeliveryStatus.SHIP ||
-            getStatus() == OrderStatus.CANCEL) {
-            throw new IllegalStateException("상품 반품 불가능");
-        }
-        this.setStatus(OrderStatus.RETURN);
-        for (OrderLine orderLine : orderLines) {
-            orderLine.back();
         }
     }
 
     public int getTotalPrice() {
         int totalPrice = 0;
 
-        for (OrderLine orderLine: orderLines) {
+        for (OrderLine orderLine : orderLines) {
             totalPrice += orderLine.getTotalPrice();
         }
 
         return totalPrice;
+    }
+
+    public void updateDeliveryStatus() {
+        LocalDateTime now = LocalDateTime.now();
+        if (getCreatedAt().plusSeconds(10).isBefore(now) && delivery.getStatus() == DeliveryStatus.READY) {
+            delivery.setStatus(DeliveryStatus.SHIP);
+        } else if (getCreatedAt().plusSeconds(20).isBefore(now) && delivery.getStatus() == DeliveryStatus.SHIP) {
+            delivery.setStatus(DeliveryStatus.COMP);
+        }
+    }
+
+    public void updateDeliverCompStatus() {
+
     }
 }
