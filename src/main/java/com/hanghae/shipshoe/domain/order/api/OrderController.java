@@ -1,5 +1,6 @@
 package com.hanghae.shipshoe.domain.order.api;
 
+import com.hanghae.shipshoe.domain.delivery.dto.DeliveryDto;
 import com.hanghae.shipshoe.domain.order.dto.OrderRequest;
 import com.hanghae.shipshoe.domain.order.dto.OrderResponse;
 import com.hanghae.shipshoe.domain.order.service.OrderService;
@@ -52,5 +53,11 @@ public class OrderController {
     @PostMapping("api/order/{orderId}/return")
     public void returnOrder(@PathVariable("orderId") Long orderId) {
         orderService.returnOrder(orderId);
+    }
+
+    // 주문 상품 배송 조회
+    @GetMapping("api/order/{orderId}/delivery")
+    public DeliveryDto getDelivery(@PathVariable("orderId") Long orderId) {
+        return orderService.getDelivery(orderId);
     }
 }

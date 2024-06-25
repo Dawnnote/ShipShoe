@@ -40,6 +40,7 @@ public class Order extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
+    protected Order() {}
 
     public void addOrderLine(OrderLine orderLine) {
         orderLines.add(orderLine);
@@ -53,9 +54,6 @@ public class Order extends BaseEntity {
 
     public void setStatus(OrderStatus status) {
         this.status = status;
-    }
-
-    protected Order() {
     }
 
     public static Order createOrder(User user, Delivery delivery, OrderLine... orderLines) {
@@ -80,16 +78,6 @@ public class Order extends BaseEntity {
         }
     }
 
-    public int getTotalPrice() {
-        int totalPrice = 0;
-
-        for (OrderLine orderLine : orderLines) {
-            totalPrice += orderLine.getTotalPrice();
-        }
-
-        return totalPrice;
-    }
-
     public void updateDeliveryStatus() {
         LocalDateTime now = LocalDateTime.now();
         if (getCreatedAt().plusSeconds(10).isBefore(now) && delivery.getStatus() == DeliveryStatus.READY) {
@@ -99,7 +87,11 @@ public class Order extends BaseEntity {
         }
     }
 
-    public void updateDeliverCompStatus() {
-
+    public int getTotalPrice() {
+        int totalPrice = 0;
+        for (OrderLine orderLine : orderLines) {
+            totalPrice += orderLine.getTotalPrice();
+        }
+        return totalPrice;
     }
 }

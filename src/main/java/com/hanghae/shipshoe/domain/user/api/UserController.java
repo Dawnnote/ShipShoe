@@ -13,11 +13,13 @@ public class UserController {
 
     private final UserService userService;
 
+    // 유저 회원가입
     @PostMapping("/api/users/signup")
     public UserResponseDto createUser(@RequestBody @Valid UserRequestDto request) {
         return userService.save(request);
     }
 
+    // 유저 프로필
     @GetMapping("/api/users/{id}")
     public UserResponseDto getUser(@PathVariable("id") Long id) {
         return userService.findUser(id);

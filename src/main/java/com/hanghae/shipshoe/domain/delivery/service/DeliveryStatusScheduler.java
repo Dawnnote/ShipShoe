@@ -13,7 +13,8 @@ public class DeliveryStatusScheduler {
 
     private final OrderService orderService;
 
-    @Scheduled(cron = "0/5 * * * * *")
+    // 매일 23시 59분 배송 상태 업데이트
+    @Scheduled(cron = "0 59 23 * * *")
     public void updateDeliveryStatus() {
         orderService.updateOrderDeliveryStatus();
         log.info("Schedule Counter");

@@ -1,5 +1,6 @@
 package com.hanghae.shipshoe.domain.order.service;
 
+import com.hanghae.shipshoe.domain.delivery.dto.DeliveryDto;
 import com.hanghae.shipshoe.domain.delivery.entity.Delivery;
 import com.hanghae.shipshoe.domain.delivery.entity.DeliveryStatus;
 import com.hanghae.shipshoe.domain.item.entity.Item;
@@ -99,6 +100,24 @@ public class OrderService {
         scheduleStatusUpdate(order);
     }
 
+    // 배송 상태 스케줄 관리
+    @Transactional
+    public void updateOrderDeliveryStatus() {
+        List<Order> orders = orderRepository.findByStatus();
+        for (Order order : orders) {
+            order.updateDeliveryStatus();
+        }
+    }
+
+    // 배송 조회 (조회 시 상태 업데이트)
+    public DeliveryDto getDelivery(Long orderId) {
+        Order order = orderRepository.findById(orderId).orElseThrow();
+        order.updateDeliveryStatus();
+        return new DeliveryDto(order.getDelivery());
+    }
+
+
+
     // 반품 D+1 후 재고 수량 변경
     public void scheduleStatusUpdate(Order order) {
         long delayInMillis = TimeUnit.SECONDS.toMillis(10);
@@ -115,14 +134,5 @@ public class OrderService {
                 log.info("Order status updated successfully");
             }
         }, delayInMillis, TimeUnit.MILLISECONDS);
-    }
-
-    // 배송 상태 스케줄 관리
-    @Transactional
-    public void updateOrderDeliveryStatus() {
-        List<Order> orders = orderRepository.findByStatus();
-        for (Order order : orders) {
-            order.updateDeliveryStatus();
-        }
     }
 }
