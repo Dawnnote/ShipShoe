@@ -2,8 +2,13 @@ package com.hanghae.shipshoe.domain.user.entity;
 
 import com.hanghae.shipshoe.domain.Address;
 import com.hanghae.shipshoe.domain.BaseEntity;
+import com.hanghae.shipshoe.domain.user.dto.UserFormDto;
 import com.hanghae.shipshoe.domain.user.dto.UserRequestDto;
+import com.hanghae.shipshoe.domain.user.dto.auth.SignUpRequestDto;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 
 @Entity
@@ -14,13 +19,21 @@ public class User extends BaseEntity {
     @Column(name = "user_id")
     private Long id;
 
+    @Email
+    @NotBlank(message = "이메일은 필수 입력값입니다")
     private String email;
+
+    @NotBlank(message = "비밀번호는 필수 입력값입니다")
     private String password;
+
+    @NotBlank(message = "이름은 필수 입력값입니다")
     private String name;
 
     @Embedded
     private Address address;
 
+    @NotBlank(message = "전화번호는 필수 입력값입니다")
+    @Pattern(regexp = "^\\d{2,3}-\\d{3,4}-\\d{4}$", message = "휴대폰 번호 양식에 맞지 않습니다.")
     private String phone;
 
     @Enumerated(value = EnumType.STRING)
@@ -36,5 +49,20 @@ public class User extends BaseEntity {
         this.address = address;
         this.phone = request.getPhone();
         this.role = RoleType.USER;
+    }
+
+    public User(SignUpRequestDto dto) {
+        this.email = dto.getEmail();
+        this.password = dto.getPassword();
+        this.name = dto.getName();
+        this.phone = dto.getPhone();
+        this.address = new Address(dto.getState(), dto.getCity(), dto.getZipcode(), dto.getStreet());
+        this.role = RoleType.USER;
+    }
+
+    public void updateUser(UserFormDto form) {
+        this.password = form.getPassword();
+        this.phone = form.getPhone();
+        this.address = new Address(form.getState(), form.getCity(), form.getZipcode(), form.getStreet());
     }
 }

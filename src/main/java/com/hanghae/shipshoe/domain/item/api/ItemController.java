@@ -3,7 +3,6 @@ package com.hanghae.shipshoe.domain.item.api;
 import com.hanghae.shipshoe.domain.item.dto.ItemRequestDto;
 import com.hanghae.shipshoe.domain.item.dto.ItemResponseDto;
 import com.hanghae.shipshoe.domain.item.service.ItemService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
