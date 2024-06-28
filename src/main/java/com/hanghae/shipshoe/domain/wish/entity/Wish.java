@@ -23,9 +23,17 @@ public class Wish {
     @JoinColumn(name = "item_id")
     private Item item;
 
-    // 수량 변경 및 주문,,,,,
-
-
     protected Wish() {
+    }
+
+    public static Wish createWish(User findUser, Item findItem) {
+        Wish wish = new Wish();
+        wish.setUserItem(findUser, findItem);
+        return wish;
+    }
+
+    private void setUserItem(User findUser, Item findItem) {
+        this.user = findUser;
+        this.item = findItem;
     }
 }
