@@ -1,0 +1,33 @@
+name: ship-shoe-cicd
+on:
+  pull_request:
+    types: [opened, synchronize, closed]
+    branches: [dev]
+    paths:
+    - 'src/**'
+
+# pr이 open 되거나 동기화 될때 실행되는 job
+jobs:
+  test:
+    if: github.event.action == 'opened' || github.event.action == 'synchronize'
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+# merge 단계에서 실행됨
+  image-build:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+# 이미지 빌드 잡이 성공한 다음 실행
+# CD 단계에서 실행하는 단계
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [image-build]
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
