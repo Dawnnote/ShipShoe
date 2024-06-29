@@ -1,4 +1,4 @@
-name: ship-shoe-cicd
+name: ship-shoe-cicd 1
 on:
   pull_request:
     types: [opened, synchronize, closed]
