@@ -1,10 +1,8 @@
-name: ship-shoe-cicd 1
+name: ship-shoe-cicd
 on:
   pull_request:
     types: [opened, synchronize, closed]
     branches: [dev]
-    paths:
-    - 'src/**'
 
 # pr이 open 되거나 동기화 될때 실행되는 job
 jobs:
