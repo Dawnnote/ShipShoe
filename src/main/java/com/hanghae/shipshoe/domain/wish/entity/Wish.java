@@ -23,9 +23,7 @@ public class Wish {
     @JoinColumn(name = "item_id")
     private Item item;
 
-    protected Wish() {
-    }
-
+    
     public static Wish createWish(User findUser, Item findItem) {
         Wish wish = new Wish();
         wish.setUserItem(findUser, findItem);
