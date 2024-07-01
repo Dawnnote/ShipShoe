@@ -24,6 +24,7 @@ public class Wish {
     private Item item;
 
 
+
     public static Wish createWish(User findUser, Item findItem) {
         Wish wish = new Wish();
         wish.setUserItem(findUser, findItem);
